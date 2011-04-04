@@ -108,7 +108,7 @@ namespace :uninstall do
 
   desc "Uninstall dotjs daemon"
   task :daemon do
-    rm "/usr/local/bin/djsd", :verbose => true
+    rm "/usr/local/djsd", :verbose => true, :force => true
   end
 
   desc "Uninstall Google Chrome extension"
