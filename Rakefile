@@ -1,6 +1,8 @@
 desc "Install dotjs"
 task :install => 'install:all'
 
+exec_path = ENV['DOTJS_EXECUTABLE_PATH'] || '/usr/local/bin'
+
 namespace :install do
   task :all => [ :prompt, :chrome, :daemon, :agent, :done ]
 
@@ -9,7 +11,7 @@ namespace :install do
     puts "\e[1m-----\e[0m"
     puts "I will install:", ""
     puts "1. The 'dotjs' Google Chrome Extension"
-    puts "2. djsd(1) in /usr/local/bin"
+    puts "2. djsd(1) in #{exec_path}"
     puts "3. com.github.dotjs in ~/Library/LaunchAgents",""
     print "Ok? (y/n) "
 
@@ -37,9 +39,14 @@ namespace :install do
 
   desc "Install launch agent"
   task :agent do
+    require 'erb'
     plist = "com.github.dotjs.plist"
+    plist_template = "#{plist}.erb"
     agent = File.expand_path("~/Library/LaunchAgents/#{plist}")
-    cp plist, agent, :verbose => true
+    File.open(agent, 'w') do |f|
+      f << ERB.new(File.read(plist_template)).result(binding)
+    end
+    # cp plist, agent, :verbose => true
     chmod 0644, agent
     puts "starting djdb..."
     sh "launchctl load -w #{agent}"
@@ -49,7 +56,7 @@ namespace :install do
 
   desc "Install dotjs daemon"
   task :daemon do
-    cp "bin/djsd", "/usr/local/bin", :verbose => true, :preserve => true
+    cp "bin/djsd", exec_path, :verbose => true, :preserve => true
   end
 
   desc "Install Google Chrome extension"
@@ -69,7 +76,7 @@ namespace :uninstall do
     puts "\e[1m\e[32mdotjs\e[0m"
     puts "\e[1m-----\e[0m"
     puts "I will remove:", ""
-    puts "1. djsd(1) from /usr/local/bin"
+    puts "1. djsd(1) from #{exec_path}"
     puts "2. com.github.dotjs from ~/Library/LaunchAgents"
     puts "3. The 'dotjs' Google Chrome Extension",""
     puts "I will not remove:", ""
@@ -109,6 +116,7 @@ namespace :uninstall do
   desc "Uninstall dotjs daemon"
   task :daemon do
     rm "/usr/local/djsd", :verbose => true, :force => true
+    rm "#{exec_path}/djsd", :verbose => true, :force => true
   end
 
   desc "Uninstall Google Chrome extension"
