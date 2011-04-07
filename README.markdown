@@ -1,4 +1,5 @@
-..................... dotjs ........................
+dotjs
+=
 
 dotjs  is a  Google Chrome  extension  that executes
 JavaScript files in `~/.js` based on their filename.
@@ -59,7 +60,7 @@ the returned JavaScript.
 
 ## Install it
 
-    git clone http://github.com/defunkt/dotjs
+    git clone https://github.com/duncanbeevers/dotjs.git
     cd dotjs
     rake install
 
